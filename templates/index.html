@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ChatGPT-like UI — Case Study</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <!--
+      Top-level app container. Layout is two columns: a left sidebar for
+      conversation management and the main chat area on the right.
+    -->
+    <div class="app">
+      <aside class="sidebar">
+        <h2>Conversations</h2>
+        <div class="convos">
+          <!-- Placeholder new conversation button. Functionality can be added later. -->
+          <button id="new-convo">+ New</button>
+        </div>
+      </aside>
+
+      <main class="chat-area">
+        <header class="chat-header">
+          <h1>Chat</h1>
+        </header>
+
+        <!-- Messages are injected by JavaScript into this container. -->
+        <section id="messages" class="messages" aria-live="polite"></section>
+
+        <!-- Composer form posts messages to the backend API. -->
+        <form id="composer" class="composer" autocomplete="off">
+          <textarea id="message-input" placeholder="Type a message..." rows="1"></textarea>
+          <button type="submit">Send</button>
+          <!-- Privacy warning shown when sensitive info is detected -->
+          <div id="privacy-warning" class="privacy-warning" role="alert" hidden>
+            ⚠️ This message may contain sensitive information (email address, SSN, etc).
+            Consider removing it before sending.
+          </div>
+        </form>
+      </main>
+    </div>
+
+    <!-- Main frontend logic: fetching/sending messages and rendering UI. -->
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>
