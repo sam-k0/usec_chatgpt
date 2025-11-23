@@ -7,6 +7,9 @@ Files:
 - static/js/app.js - Frontend logic
 - requirements.txt - Python dependencies
 
+You will need a .env file with:
+OLLAMA_URL = 'https://...' # Your Ollama server URL
+
 Run:
 1. python3 -m venv venv
 2. source venv/bin/activate
