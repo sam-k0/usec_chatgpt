@@ -14,8 +14,4 @@ Run:
 1. python3 -m venv venv
 2. source venv/bin/activate
 3. pip install -r requirements.txt
-4. FLASK_APP=app.py flask run
-
-Notes:
-- This is a demo UI only; no real OpenAI integration included.
-- Extend app.py to add backend AI calls or persistence.
+4. python app.py
