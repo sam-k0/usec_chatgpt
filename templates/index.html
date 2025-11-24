@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>ChatGPT-like UI — Case Study</title>
+    <title>ChatGPTea</title>
     <link rel="stylesheet" href="/static/css/style.css" />
   </head>
   <body>
@@ -16,7 +16,7 @@
         <h2>Conversations</h2>
         <div class="convos">
           <!-- Placeholder new conversation button. Functionality can be added later. -->
-          <button id="new-convo">+ New</button>
+          <button id="new-convo">+ Chat erstellen</button>
         </div>
       </aside>
 
@@ -31,11 +31,10 @@
         <!-- Composer form posts messages to the backend API. -->
         <form id="composer" class="composer" autocomplete="off">
           <textarea id="message-input" placeholder="Type a message..." rows="1"></textarea>
-          <button type="submit">Send</button>
+          <button type="submit">Absenden</button>
           <!-- Privacy warning shown when sensitive info is detected -->
           <div id="privacy-warning" class="privacy-warning" role="alert" hidden>
-            ⚠️ This message may contain sensitive information (email address, SSN, etc).
-            Consider removing it before sending.
+            ⚠️ Diese Nachricht könnte potenziell private Informationen enthalten.
           </div>
         </form>
       </main>

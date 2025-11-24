@@ -3,20 +3,23 @@ import os
 import re
 import time
 import requests
+import json
 from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
 OLLAMA_URL = os.getenv('OLLAMA_URL')
 OLLAMA_MODEL = 'gemma3:27b'
 MESSAGES = []
+SYSTEM_PROMPT = "You are a helpful assistant for text writing. Please do not use markdown in your response as the webinterface rendering the messages cannot deal with it."
 
 # How many past messages to include when building conversation history
-MAX_HISTORY_MESSAGES = 12
+MAX_HISTORY_MESSAGES = 99
 # If True, redact privacy-flagged messages before sending to the model
-REDACT_PRIVACY = True
+REDACT_PRIVACY = False
 
 
 ollama_llm = ChatOllama(base_url=OLLAMA_URL,model=OLLAMA_MODEL)
@@ -35,7 +38,7 @@ def call_ai_model(prompt: str) -> str:
 
     parts = []
     # Optional system instruction (tweak as needed)
-    parts.append("System: You are a helpful assistant for a UX case study.")
+    parts.append(f"System: {SYSTEM_PROMPT}")
 
     for m in history:
         role = m.get('role', 'user')
@@ -57,9 +60,9 @@ def call_ai_model(prompt: str) -> str:
     # Call the ChatOllama generate API with a single conversation
     try:
         result = ollama_llm.generate([[HumanMessage(serialized)]])
-    except Exception:
+    except Exception as e:
         # Graceful fallback: return an echo if generation fails
-        return f"Echo: {prompt}"
+        return f"Error: Could not generate response: {e}"
 
     # Extract generated text from result structure
     gens = getattr(result, "generations", None)
@@ -72,11 +75,6 @@ def call_ai_model(prompt: str) -> str:
 
 
 app = Flask(__name__)
-
-# Simple in-memory message store (cleared on restart)
-# For a real application, replace with persistent storage (database).
-
-
 
 @app.route('/')
 def index():
@@ -142,6 +140,38 @@ def post_message():
 
     # Return the assistant message so the frontend can update optimistically.
     return jsonify(ai_msg), 201
+
+
+@app.route('/api/save_conversation', methods=['POST'])
+def save_conversation():
+    """Save the current `MESSAGES` list to a timestamped JSON file and clear it.
+
+    The file is written to an `archives/` directory located in the project root.
+    Returns 200 with the saved filename on success, or an error status on failure.
+    """
+    if not MESSAGES:
+        return jsonify({'error': 'No messages to save'}), 400
+
+    # Ensure the archive directory exists
+    archive_dir = os.path.join(os.getcwd(), 'archives')
+    try:
+        os.makedirs(archive_dir, exist_ok=True)
+    except Exception as e:
+        return jsonify({'error': f'Could not create archive directory: {e}'}), 500
+
+    ts = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+    filename = os.path.join(archive_dir, f'{ts}.json')
+
+    try:
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(MESSAGES, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        return jsonify({'error': f'Failed to write archive file: {e}'}), 500
+
+    # Clear conversation in memory
+    MESSAGES.clear()
+
+    return jsonify({'saved': filename}), 200
 
 
 if __name__ == '__main__':

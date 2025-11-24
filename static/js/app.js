@@ -29,11 +29,12 @@ function renderMessages(msgs) {
     // text is escaped to prevent injection from untrusted input.
     // If the message has a `privacy` flag, inject a small open-lock icon
     // positioned in the bottom-right corner of the bubble.
-    const lockHtml = m.privacy ? `<span class="privacy-icon" title="Potential private info exposed">` +
-      `<!-- open lock icon -->` +
+    const lockHtml = m.privacy ? `<span class="privacy-icon" title="Enthält potenziell private Informationen">` +
+      `<!-- warning triangle icon -->` +
       `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">` +
-      `<path d="M17 8V7a5 5 0 00-10 0v1" stroke="#f1b0b0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>` +
-      `<rect x="3" y="8" width="18" height="13" rx="2" stroke="#f1b0b0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>` +
+      `<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#f1b0b0" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>` +
+      `<line x1="12" y1="8" x2="12" y2="13" stroke="#f1b0b0" stroke-width="1.5" stroke-linecap="round"/>` +
+      `<circle cx="12" cy="17" r="0.8" fill="#f1b0b0"/>` +
       `</svg>` +
       `</span>` : '';
 
@@ -81,15 +82,15 @@ async function sendMessage(text) {
  */
 function detectPrivacyIssues(text) {
   if (!text) return false;
-  
+
   // Check for email addresses
   const emailPattern = /[\w.+-]+@[\w-]+\.[\w.-]+/;
   if (emailPattern.test(text)) return true;
-  
+
   // Check for SSN-like patterns
   const ssnPattern = /\b\d{3}-?\d{2}-?\d{4}\b/;
   if (ssnPattern.test(text)) return true;
-  
+
   return false;
 }
 
@@ -97,6 +98,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const form = document.getElementById('composer');
   const input = document.getElementById('message-input');
   const warning = document.getElementById('privacy-warning');
+  const newConvoBtn = document.getElementById('new-convo');
 
   // Real-time privacy check while typing
   let checkTimer;
@@ -112,6 +114,36 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Load and render existing messages on startup.
   const msgs = await fetchMessages();
   renderMessages(msgs);
+
+  // New conversation button: save current messages to server-side file and clear
+  if (newConvoBtn) {
+    newConvoBtn.addEventListener('click', async () => {
+      // Ask user to confirm saving & clearing the conversation
+      const confirmMsg = 'Möchten Sie den aktuellen Chat speichern und löschen? Dies kann nicht rückgängig gemacht werden.';
+      if (!confirm(confirmMsg)) return;
+
+      // Disable button while processing
+      newConvoBtn.disabled = true;
+      try {
+        const res = await fetch('/api/save_conversation', { method: 'POST' });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          alert('Could not save conversation: ' + (err.error || res.statusText));
+        } else {
+          const data = await res.json();
+          // Refresh messages from server (should be empty after clearing)
+          const updated = await fetchMessages();
+          renderMessages(updated);
+          // Notify user of saved file name (server returns absolute path)
+          alert('Conversation saved: ' + (data.saved || 'unknown'));
+        }
+      } catch (e) {
+        alert('Error saving conversation: ' + e);
+      } finally {
+        newConvoBtn.disabled = false;
+      }
+    });
+  }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
