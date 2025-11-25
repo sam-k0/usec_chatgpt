@@ -99,6 +99,39 @@ window.addEventListener('DOMContentLoaded', async () => {
   const input = document.getElementById('message-input');
   const warning = document.getElementById('privacy-warning');
   const newConvoBtn = document.getElementById('new-convo');
+  const sidebar = document.getElementById('sidebar');
+  const resizeHandle = document.querySelector('.sidebar-resize-handle');
+
+  // Sidebar resize functionality
+  let isResizing = false;
+  resizeHandle.addEventListener('mousedown', () => {
+    isResizing = true;
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    // Get sidebar position relative to viewport
+    const sidebarRect = sidebar.getBoundingClientRect();
+    const newWidth = e.clientX - sidebarRect.left;
+    // Constrain width between min-width and max-width
+    if (newWidth >= 180 && newWidth <= 600) {
+      sidebar.style.width = newWidth + 'px';
+    }
+  });
+  document.addEventListener('mouseup', () => {
+    isResizing = false;
+  });
+
+  // Set up task expand/collapse toggles
+  const taskHeaders = document.querySelectorAll('.task-header');
+  taskHeaders.forEach((header) => {
+    header.addEventListener('click', () => {
+      const isExpanded = header.getAttribute('aria-expanded') === 'true';
+      const content = header.nextElementSibling;
+      
+      header.setAttribute('aria-expanded', !isExpanded);
+      content.hidden = isExpanded;
+    });
+  });
 
   // Real-time privacy check while typing
   let checkTimer;

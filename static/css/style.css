@@ -29,7 +29,113 @@ body{
 }
 
 .app{display:flex;height:100vh}
-.sidebar{width:260px;background:var(--panel);padding:16px;border-right:1px solid rgba(255,255,255,0.03)}
+.sidebar{
+  width:260px;
+  background:var(--panel);
+  padding:16px;
+  border-right:1px solid rgba(255,255,255,0.03);
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  position:relative;
+  min-width: 180px;
+  max-width: 600px;
+}
+
+/* Resize handle on the right edge of sidebar */
+.sidebar-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.15s ease-out;
+}
+
+.sidebar-resize-handle:hover {
+  background: rgba(139, 143, 149, 0.3);
+}
+
+/* Tasks section */
+.tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task-item {
+  border: 1px solid rgba(255,255,255,0.02);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.task-header {
+  width: 100%;
+  background: rgba(255,255,255,0.02);
+  border: none;
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #e6e9ec;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.15s ease-out;
+}
+
+.task-header:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+.task-toggle {
+  display: inline-flex;
+  font-size: 11px;
+  transition: transform 0.2s ease-out;
+  margin-left: 8px;
+}
+
+.task-header[aria-expanded="true"] .task-toggle {
+  transform: rotate(90deg);
+}
+
+.task-content {
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.01);
+  font-size: 12px;
+  line-height: 1.5;
+  color: #9aa0a6;
+  border-top: 1px solid rgba(255,255,255,0.02);
+}
+
+.task-content p {
+  margin: 0;
+}
+
+/* Task details formatted for easy copy-paste */
+.task-details ul {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.task-details li {
+  padding: 6px 0;
+  margin: 0;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  word-break: break-word;
+  user-select: all;
+}
+
+.task-details li:before {
+  content: '• ';
+  color: #5a6268;
+  margin-right: 6px;
+}
 .chat-area{flex:1;display:flex;flex-direction:column}
 .chat-header{padding:16px;border-bottom:1px solid rgba(255,255,255,0.03)}
 .messages{flex:1;padding:20px;overflow:auto}

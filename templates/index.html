@@ -12,12 +12,68 @@
       conversation management and the main chat area on the right.
     -->
     <div class="app">
-      <aside class="sidebar">
-        <h2>Conversations</h2>
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-resize-handle"></div>
         <div class="convos">
           <!-- Placeholder new conversation button. Functionality can be added later. -->
-          <button id="new-convo">+ Chat erstellen</button>
+          <button id="new-convo">Chat speichern</button>
         </div>
+        <h2>Tasks</h2>
+        <div class="tasks">
+          <!-- Task 1: Expandable/collapsible -->
+          <div class="task-item">
+            <button class="task-header" aria-expanded="false">
+              <span class="task-title">Use ChatGPTea to write an application letter to a company</span>
+              <span class="task-toggle">▶</span>
+            </button>
+            <div class="task-content" hidden>
+              <div class="task-details">
+                <ul>
+                  <li>Company Name: Shipping Croatia</li>
+                  <li>Contact Address: scroa@example.com</li>
+                  <li>Position: Senior Developer</li>
+                  <li>Your Name: John Doe</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Task 2: Expandable/collapsible -->
+          <div class="task-item">
+            <button class="task-header" aria-expanded="false">
+              <span class="task-title">Create a summary of machine learning techniques</span>
+              <span class="task-toggle">▶</span>
+            </button>
+            <div class="task-content" hidden>
+              <div class="task-details">
+                <ul>
+                  <li>Focus on: Supervised Learning, Unsupervised Learning, Reinforcement Learning</li>
+                  <li>Include examples for each technique</li>
+                  <li>Target audience: Beginners</li>
+                  <li>Format: Markdown bullet points</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Task 3: Expandable/collapsible -->
+          <div class="task-item">
+            <button class="task-header" aria-expanded="false">
+              <span class="task-title">Draft a project proposal for a web application</span>
+              <span class="task-toggle">▶</span>
+            </button>
+            <div class="task-content" hidden>
+              <div class="task-details">
+                <ul>
+                  <li>Project Name: Todo Collaboration Platform</li>
+                  <li>Team Size: 4 people</li>
+                  <li>Timeline: 8 weeks</li>
+                  <li>Budget: €50,000</li>
+                  <li>Key Features: Real-time sync, user management, task tracking</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        
       </aside>
 
       <main class="chat-area">
