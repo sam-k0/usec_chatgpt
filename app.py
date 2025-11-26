@@ -14,7 +14,11 @@ load_dotenv()
 OLLAMA_URL = os.getenv('OLLAMA_URL')
 OLLAMA_MODEL = 'gemma3:27b'
 MESSAGES = []
-SYSTEM_PROMPT = "You are a helpful assistant for text writing. Please do not use markdown or formatting like asteriks in your response as the webinterface rendering the messages cannot deal with it."
+SYSTEM_PROMPT = """
+ You are a helpful assistant for text writing.
+ Please do not use markdown or formatting like asteriks in your response as the webinterface rendering the messages cannot deal with it.
+ Answer in the language that the user speaks to you, this will most likely be German or English.
+ """
 
 # How many past messages to include when building conversation history
 MAX_HISTORY_MESSAGES = 99
