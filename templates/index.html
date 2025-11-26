@@ -34,10 +34,12 @@
                   <li>Alter: 25</li>				
                   <li>Handynummer: 152 54599371</li>
                   <li>Interessen: Fußball, Wandern, Puzzles, Teamarbeiten</li>
-                  <li>Werdegang: </li>
-                  <li>Grundschule Am Hanstein  2006-2010</li>
-                  <li>Frobenius Gymnasium Hammelburg 2010-2018</li>
-                  <li>Medizinische Fakultät Heidelberg: Zahnarztmedizin 2019-2025</li>
+                  <li>Werdegang: <br>
+                  - Grundschule Am Hanstein  2006-2010<br>
+                  - Frobenius Gymnasium Hammelburg 2010-2018<br>
+                  - Medizinische Fakultät Heidelberg: Zahnarztmedizin 2019-2025<br>
+                  
+                  </li>
                   <li>Schwerpunkte: Diagnose, Beratung, Implantat</li>
                 </ul>
               </div>
@@ -86,6 +88,7 @@
       <main class="chat-area">
         <header class="chat-header">
           <h1>Chat</h1>
+          <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">🌙</button>
         </header>
 
         <!-- Messages are injected by JavaScript into this container. -->
@@ -93,7 +96,7 @@
 
         <!-- Composer form posts messages to the backend API. -->
         <form id="composer" class="composer" autocomplete="off">
-          <textarea id="message-input" placeholder="Type a message..." rows="1"></textarea>
+          <textarea id="message-input" placeholder="Schreibe eine Nachricht an KI..." rows="1"></textarea>
           <button type="submit">Absenden</button>
           <!-- Privacy warning shown when sensitive info is detected -->
           <div id="privacy-warning" class="privacy-warning" role="alert" hidden>

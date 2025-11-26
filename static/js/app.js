@@ -99,8 +99,33 @@ window.addEventListener('DOMContentLoaded', async () => {
   const input = document.getElementById('message-input');
   const warning = document.getElementById('privacy-warning');
   const newConvoBtn = document.getElementById('new-convo');
+  const themeToggle = document.getElementById('theme-toggle');
   const sidebar = document.getElementById('sidebar');
   const resizeHandle = document.querySelector('.sidebar-resize-handle');
+
+  // Theme toggle functionality
+  const initializeTheme = () => {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeToggleIcon(savedTheme);
+  };
+
+  const updateThemeToggleIcon = (theme) => {
+    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+  };
+
+  const toggleTheme = () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeToggleIcon(newTheme);
+  };
+
+  initializeTheme();
+  if (themeToggle) {
+    themeToggle.addEventListener('click', toggleTheme);
+  }
 
   // Sidebar resize functionality
   let isResizing = false;
@@ -142,6 +167,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       const hasPrivacyIssues = detectPrivacyIssues(input.value);
       warning.hidden = !hasPrivacyIssues;
     }, 300);
+
+    // Auto-grow textarea height based on content
+    input.style.height = 'auto';
+    const newHeight = Math.min(input.scrollHeight, 300);
+    input.style.height = newHeight + 'px';
   });
 
   // Load and render existing messages on startup.
