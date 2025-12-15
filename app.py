@@ -16,7 +16,8 @@ OLLAMA_MODEL = 'gemma3:27b'
 MESSAGES = []
 SYSTEM_PROMPT = """
  You are a helpful assistant for text writing.
- Please do not use markdown or formatting like asteriks in your response as the webinterface rendering the messages cannot deal with it.
+ Please do not use markdown or formatting like asteriks for bold text in your response as the webinterface rendering the messages cannot deal with it.
+ The only formatting you are allowed to do is using line breaks to structure your answer into paragraphs, or using numbered or bulleted lists, which also need linebreaks to be added manually.
  Answer in the language that the user speaks to you, this will most likely be German or English.
  """
 
@@ -151,10 +152,17 @@ def save_conversation():
     """Save the current `MESSAGES` list to a timestamped JSON file and clear it.
 
     The file is written to an `archives/` directory located in the project root.
+    Accepts an optional `conversation_id` in the JSON body to prefix the filename.
+    Filename format: ID-[id]-YYYY-mm-dd-HH-MM-SS.json
+    
     Returns 200 with the saved filename on success, or an error status on failure.
     """
     if not MESSAGES:
         return jsonify({'error': 'No messages to save'}), 400
+
+    # Get optional conversation ID from request body
+    data = request.get_json() or {}
+    conversation_id = data.get('conversation_id', '').strip()
 
     # Ensure the archive directory exists
     archive_dir = os.path.join(os.getcwd(), 'archives')
@@ -164,7 +172,12 @@ def save_conversation():
         return jsonify({'error': f'Could not create archive directory: {e}'}), 500
 
     ts = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    filename = os.path.join(archive_dir, f'{ts}.json')
+    
+    # Build filename with optional ID prefix
+    if conversation_id:
+        filename = os.path.join(archive_dir, f'ID-{conversation_id}-{ts}.json')
+    else:
+        filename = os.path.join(archive_dir, f'{ts}.json')
 
     try:
         with open(filename, 'w', encoding='utf-8') as f:

@@ -181,6 +181,14 @@ window.addEventListener('DOMContentLoaded', async () => {
   // New conversation button: save current messages to server-side file and clear
   if (newConvoBtn) {
     newConvoBtn.addEventListener('click', async () => {
+      // Prompt user for an ID to name the conversation
+      const conversationId = prompt('Geben Sie eine ID für diesen Chat ein:');
+      if (conversationId === null) return; // User cancelled the prompt
+      if (conversationId.trim() === '') {
+        alert('ID kann nicht leer sein.');
+        return;
+      }
+
       // Ask user to confirm saving & clearing the conversation
       const confirmMsg = 'Möchten Sie den aktuellen Chat speichern und löschen? Dies kann nicht rückgängig gemacht werden.';
       if (!confirm(confirmMsg)) return;
@@ -188,7 +196,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       // Disable button while processing
       newConvoBtn.disabled = true;
       try {
-        const res = await fetch('/api/save_conversation', { method: 'POST' });
+        const res = await fetch('/api/save_conversation', { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ conversation_id: conversationId.trim() })
+        });
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
           alert('Could not save conversation: ' + (err.error || res.statusText));
