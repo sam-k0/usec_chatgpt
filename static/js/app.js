@@ -77,19 +77,65 @@ async function sendMessage(text) {
 
 // Wire up the UI once the DOM is ready.
 /**
- * Check text for potential privacy issues (emails, SSNs, etc).
- * Uses the same patterns as the backend for consistency.
+ * Simple hash function to detect if input text has changed.
+ * Uses a basic djb2 algorithm for quick comparison.
+ */
+function hashString(str) {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
+  }
+  return hash.toString(36);
+}
+
+/**
+ * Check text for potential privacy issues (emails, SSNs, persona data, etc).
+ * Uses the same patterns as the backend for consistency, plus hardcoded persona data.
  */
 function detectPrivacyIssues(text) {
   if (!text) return false;
 
+  const lowerText = text.toLowerCase();
+
   // Check for email addresses
-  const emailPattern = /[\w.+-]+@[\w-]+\.[\w.-]+/;
+  const emailPattern = /[\w.+-]+@[\w-]+\.[\w.-]+/i;
   if (emailPattern.test(text)) return true;
 
   // Check for SSN-like patterns
   const ssnPattern = /\b\d{3}-?\d{2}-?\d{4}\b/;
   if (ssnPattern.test(text)) return true;
+
+  // Persona data from tasks - Alex Adler
+  const alexData = [
+    'alex adler',
+    'alex.adler',
+    'alex adler.bewerbungsunterlagen@example.com',
+    '152 54599371',
+    '15254599371',
+    'frobenius gymnasium',
+    'hanstein',
+    'medizinische fakultät heidelberg',
+    'zahnarzt',
+    'zahnarztmedizin',
+  ];
+
+  // Persona data - Erika Mustermann
+  const erikaData = [
+    'erika mustermann',
+    'mustermann',
+    '22.12.1974',
+    '22-12-1974',
+    '22121974',
+    'arthritis',
+  ];
+
+  // Check if any persona data is in the text
+  const allPersonaData = [...alexData, ...erikaData];
+  for (const data of allPersonaData) {
+    if (lowerText.includes(data.toLowerCase())) {
+      return true;
+    }
+  }
 
   return false;
 }
@@ -102,6 +148,16 @@ window.addEventListener('DOMContentLoaded', async () => {
   const themeToggle = document.getElementById('theme-toggle');
   const sidebar = document.getElementById('sidebar');
   const resizeHandle = document.querySelector('.sidebar-resize-handle');
+  const privacyModal = document.getElementById('privacy-modal');
+  const privacyModalOverlay = document.querySelector('.privacy-modal-overlay');
+  const privacyModalDismiss = document.getElementById('privacy-modal-dismiss');
+  const privacyModalSend = document.getElementById('privacy-modal-send');
+  const privacyModalDismissPermanently = document.getElementById('privacy-modal-dismiss-permanently');
+
+  // Track input hash and whether privacy warnings are permanently dismissed
+  let lastInputHash = null;
+  let privacyWarningsDismissed = false;
+  let pendingMessageToSend = null;
 
   // Theme toggle functionality
   const initializeTheme = () => {
@@ -120,6 +176,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
     updateThemeToggleIcon(newTheme);
+  };
+
+  const hidePrivacyModal = () => {
+    privacyModal.hidden = true;
+  };
+
+  const showPrivacyModal = () => {
+    privacyModal.hidden = false;
   };
 
   initializeTheme();
@@ -164,8 +228,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Debounce the check to avoid too many updates
     clearTimeout(checkTimer);
     checkTimer = setTimeout(() => {
-      const hasPrivacyIssues = detectPrivacyIssues(input.value);
-      warning.hidden = !hasPrivacyIssues;
+      const currentHash = hashString(input.value);
+      
+      // Only check privacy if input has changed
+      if (currentHash !== lastInputHash) {
+        lastInputHash = currentHash;
+        const hasPrivacyIssues = detectPrivacyIssues(input.value);
+        warning.hidden = !hasPrivacyIssues;
+      }
     }, 300);
 
     // Auto-grow textarea height based on content
@@ -173,6 +243,54 @@ window.addEventListener('DOMContentLoaded', async () => {
     const newHeight = Math.min(input.scrollHeight, 300);
     input.style.height = newHeight + 'px';
   });
+
+  // Privacy modal dismiss button
+  privacyModalDismiss.addEventListener('click', () => {
+    hidePrivacyModal();
+    pendingMessageToSend = null;
+  });
+
+  // Privacy modal dismiss permanently button
+  privacyModalDismissPermanently.addEventListener('click', () => {
+    privacyWarningsDismissed = true;
+    hidePrivacyModal();
+    pendingMessageToSend = null;
+  });
+
+  // Privacy modal send anyway button
+  privacyModalSend.addEventListener('click', async () => {
+    hidePrivacyModal();
+    if (pendingMessageToSend) {
+      const messageText = pendingMessageToSend;
+      pendingMessageToSend = null;
+      await sendMessageToBackend(messageText);
+    }
+  });
+
+  // Privacy modal overlay click to dismiss
+  privacyModalOverlay.addEventListener('click', () => {
+    hidePrivacyModal();
+    pendingMessageToSend = null;
+  });
+
+  // Helper function to send message to backend
+  async function sendMessageToBackend(text) {
+    // Clear the input and hide any warnings
+    input.value = '';
+    warning.hidden = true;
+
+    // Optimistic UI: render the user's message immediately while the
+    // server processes the request.
+    const before = await fetchMessages();
+    renderMessages(before.concat([{ role: 'user', text, ts: Date.now() / 1000 }]));
+
+    // Send to backend
+    await sendMessage(text);
+
+    // Refresh the message list to include the assistant response.
+    const updated = await fetchMessages();
+    renderMessages(updated);
+  }
 
   // Load and render existing messages on startup.
   const msgs = await fetchMessages();
@@ -225,21 +343,15 @@ window.addEventListener('DOMContentLoaded', async () => {
     const text = input.value.trim();
     if (!text) return; // ignore empty submits
 
-    // Clear the input and hide any warnings
-    input.value = '';
-    warning.hidden = true;
+    // Check for privacy issues
+    if (!privacyWarningsDismissed && detectPrivacyIssues(text)) {
+      // Show modal and store the message for later sending
+      pendingMessageToSend = text;
+      showPrivacyModal();
+      return;
+    }
 
-    // Optimistic UI: render the user's message immediately while the
-    // server processes the request. We append the optimistic message to the
-    // current message list and then re-fetch to get the authoritative state.
-    const before = await fetchMessages();
-    renderMessages(before.concat([{ role: 'user', text, ts: Date.now() / 1000 }]));
-
-    // Send to backend (placeholder echo behavior currently).
-    await sendMessage(text);
-
-    // Refresh the message list to include the assistant response.
-    const updated = await fetchMessages();
-    renderMessages(updated);
+    // Send message if no privacy issues or warnings are dismissed
+    await sendMessageToBackend(text);
   });
 });

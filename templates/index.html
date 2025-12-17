@@ -47,7 +47,7 @@
           <!-- Task 2: Expandable/collapsible -->
           <div class="task-item">
             <button class="task-header" aria-expanded="false">
-              <span class="task-title">Bewerbungsschreiben formulieren</span>
+              <span class="task-title">Lebenslauf schreiben lassen</span>
               <span class="task-toggle">▶</span>
             </button>
             <div class="task-content" hidden>
@@ -103,6 +103,20 @@
           </div>
         </form>
       </main>
+    </div>
+
+    <!-- Privacy warning modal -->
+    <div id="privacy-modal" class="privacy-modal" hidden>
+      <div class="privacy-modal-overlay"></div>
+      <div class="privacy-modal-content">
+        <h2>⚠️ Private Informationen erkannt</h2>
+        <p>Die Nachricht, die Sie eingeben, scheint persönliche oder sensible Informationen zu enthalten. Bitte überprüfen Sie Ihre Eingabe vor dem Absenden.<br><b>Bitte ziehen Sie in Erwägung, private Informationen zu anonymisieren!<b></p>
+        <div class="privacy-modal-actions">
+          <button id="privacy-modal-dismiss" class="privacy-modal-btn secondary">Abbrechen</button>
+          <button id="privacy-modal-dismiss-permanently" class="privacy-modal-btn secondary small">Nicht mehr anzeigen</button>
+          <button id="privacy-modal-send" class="privacy-modal-btn primary">Trotzdem absenden</button>
+        </div>
+      </div>
     </div>
 
     <!-- Main frontend logic: fetching/sending messages and rendering UI. -->

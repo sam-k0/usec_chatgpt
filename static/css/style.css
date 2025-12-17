@@ -278,3 +278,122 @@ body{
   opacity: 1;
 }
 
+/* Privacy warning modal (foreground popup) */
+.privacy-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.privacy-modal[hidden] {
+  display: none;
+}
+
+.privacy-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.privacy-modal-content {
+  position: relative;
+  background: var(--panel);
+  border: 2px solid #663333;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+}
+
+.privacy-modal-content h2 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  color: #f1b0b0;
+}
+
+.privacy-modal-content p {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.privacy-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.privacy-modal-btn {
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.privacy-modal-btn.primary {
+  background: #663333;
+  color: #f1b0b0;
+  border-color: #663333;
+}
+
+.privacy-modal-btn.primary:hover {
+  background: #774444;
+  border-color: #774444;
+}
+
+.privacy-modal-btn.secondary {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.privacy-modal-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.privacy-modal-btn.small {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+[data-theme="light"] .privacy-modal-content {
+  background: #ffffff;
+  border-color: #daa5a5;
+}
+
+[data-theme="light"] .privacy-modal-content h2 {
+  color: #cc6666;
+}
+
+[data-theme="light"] .privacy-modal-btn.primary {
+  background: #e8c4c4;
+  color: #663333;
+  border-color: #d0a0a0;
+}
+
+[data-theme="light"] .privacy-modal-btn.primary:hover {
+  background: #deb0b0;
+}
+
+[data-theme="light"] .privacy-modal-btn.secondary {
+  color: #333333;
+}
+
+[data-theme="light"] .privacy-modal-btn.secondary:hover {
+  background: #f0f0f0;
+}
+
