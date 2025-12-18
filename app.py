@@ -18,7 +18,7 @@ SYSTEM_PROMPT = """
  You are a helpful assistant for text writing.
  Please do not use markdown or formatting like asteriks for bold text in your response as the webinterface rendering the messages cannot deal with it.
  The only formatting you are allowed to do is using line breaks to structure your answer into paragraphs, or using numbered or bulleted lists, which also need linebreaks to be added manually.
- Answer in the language that the user speaks to you, this will most likely be German or English.
+ Answer in the language that the user speaks to you, this will most likely be German or English, but please default to German.
  """
 
 # How many past messages to include when building conversation history
@@ -57,7 +57,7 @@ def call_ai_model(prompt: str) -> str:
             parts.append(f"Assistant: {text}")
 
     # Append the current prompt as the latest user message
-    parts.append(f"User: {prompt}")
+    #parts.append(f"User: {prompt}")
     parts.append("Assistant:")
 
     serialized = "\n".join(parts)
